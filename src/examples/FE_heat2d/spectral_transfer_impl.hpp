@@ -54,20 +54,20 @@ namespace pfasst
                             integral_constant<size_t, dim>
                     >::value
             >::type>::set_matrix(Dune::BCRSMatrix <Dune::FieldMatrix<double, 1, 1>> interpolate, Dune::BCRSMatrix <Dune::FieldMatrix<double, 1, 1>> restrict)
-    {
-	    interpolate_matrix = interpolate;
-	    
-	    restrict_matrix   = restrict;
-
-	    for (int i=0; i< restrict_matrix.N(); i++){
-	      for (int j=0; j< restrict_matrix.M(); j++){
-		if(restrict_matrix.exists(i,j)){	
-		  if (restrict_matrix[i][j]==0.5 ) restrict_matrix[i][j]=0;
-		}
-
-	      }
-	    }
-    }
+            {
+              interpolate_matrix = interpolate;
+              
+              restrict_matrix   = restrict;
+              #if 0
+              for (int i=0; i< restrict_matrix.N(); i++){
+                for (int j=0; j< restrict_matrix.M(); j++){
+                  if(restrict_matrix.exists(i,j)){
+                    if (restrict_matrix[i][j]==0.5 ) restrict_matrix[i][j]=0;
+                  }
+                }
+              }
+              #endif
+            }
 
 
     

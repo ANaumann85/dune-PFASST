@@ -480,7 +480,7 @@ namespace pfasst
         auto rect = [center](const auto& x) { double d=(center-x[1])/0.25; return  std::abs(d) <= 1.0 ? cos(d*M_PI/2) : 0.0 ;  };
         //auto rect = [center](const auto& x) { double d=(center-x[1])/0.25; return  std::abs(d) <= 1.0 ? 1.0 : 0.0 ;  };
         //add the neumann part
-        fastBoundary(yIn, [&](double uh, const auto& posGlobal) { return rect(posGlobal)*alpha*(v0 /*-uh*/); }, out);
+        fastBoundary(yIn, [&](double uh, const auto& posGlobal) { return rect(posGlobal)*alpha*(v0 -uh); }, out);
       }
       
       template<class SweeperTrait, typename Enabled>

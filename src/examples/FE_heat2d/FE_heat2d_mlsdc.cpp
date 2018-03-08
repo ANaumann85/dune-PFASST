@@ -108,12 +108,14 @@ namespace pfasst
 
       void run_mlsdc(const size_t nelements, const size_t basisorder, const size_t DIM, const size_t coarse_factor,
                                            const size_t nnodes, const QuadratureType& quad_type,
-                                           const double& t_0, const double& dt, const double& t_end,
+                                           const double& t_0, unsigned nSteps, const double& t_end,
                                            const size_t niter) 
       {
-        unsigned nCoarse = 10;
-        unsigned nFine = 2;
+        using pfasst::config::get_value;
         typedef sweeper_t::GridType GridType;
+        
+        unsigned nCoarse = get_value<std::size_t>("--nCoarse",1);
+        unsigned nFine = get_value<std::size_t>("--nFine",1);
         auto mlsdc = std::make_shared<heat_FE_mlsdc_t>();
 
         std::shared_ptr<GridType > mlsdcGrid(sweeper_t::createGrid(nelements));
@@ -145,7 +147,7 @@ namespace pfasst
 
 
         mlsdc->status()->time() = t_0;
-        mlsdc->status()->dt() = dt;
+        mlsdc->status()->dt() = (t_end-t_0)/nSteps;
         mlsdc->status()->t_end() = t_end;
         mlsdc->status()->max_iterations() = niter;
 
@@ -169,9 +171,9 @@ namespace pfasst
 
 
 
-	Dune::Timer timer;
+        Dune::Timer timer;
         mlsdc->run(nCoarse, nFine);
-	std::cout << "solve-mlsc: " << timer.elapsed() << std::endl;
+        std::cout << "solve-mlscd: " << timer.elapsed() << std::endl;
 
 
         mlsdc->post_run();
@@ -215,9 +217,11 @@ namespace pfasst
           VectorType z = sweeper->initial_state()->data();
           vtkWriter.addVertexData(x, "fe_solution");
           //vtkWriter.addVertexData(y, "exact_solution");
-          vtkWriter.addVertexData(z, "initial_data");
+          //vtkWriter.addVertexData(z, "initial_data");
           
-          vtkWriter.write("heat2dMoving_result_mlsdc");
+          std::stringstream fname;
+          fname << "heat2dMoving_result_mlsdc_nCoarse_" << nCoarse << "_nFine_" << nFine << "_nIter_" << niter << "_nSteps_" << nSteps;
+          vtkWriter.write(fname.str());
         }
         if(BASIS_ORDER==1 && false) {
           auto sweeper = coarse;
@@ -282,6 +286,6 @@ int main(int argc, char** argv)
   }
   const size_t niter = get_value<size_t>("--num_iters", 50);
 
-  pfasst::examples::heat_FE::run_mlsdc(nelements, BASIS_ORDER, DIM, coarse_factor, nnodes, quad_type, t_0, dt, t_end, niter);
+  pfasst::examples::heat_FE::run_mlsdc(nelements, BASIS_ORDER, DIM, coarse_factor, nnodes, quad_type, t_0, nsteps, t_end, niter);
 }
 #endif 
