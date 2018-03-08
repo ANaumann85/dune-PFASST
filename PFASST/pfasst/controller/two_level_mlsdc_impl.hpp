@@ -153,7 +153,7 @@ namespace pfasst
 
   template<class TransferT, class CommT>
   void
-  TwoLevelMLSDC<TransferT, CommT>::run()
+  TwoLevelMLSDC<TransferT, CommT>::run(int nCoarse, int nFine)
   {
     Controller<TransferT, CommT>::run();
 
@@ -190,10 +190,12 @@ namespace pfasst
           ML_CLOG(INFO, this->get_logger_id(), "Iteration " << this->get_status()->get_iteration());
 
           this->cycle_down();
-          this->sweep_coarse();
+          for(int i(0); i < nCoarse; ++i)
+            this->sweep_coarse();
 
           this->cycle_up();
-          this->sweep_fine();
+          for(int i(0); i < nFine; ++i)
+            this->sweep_fine();
         }
 
         this->status()->set_primary_state(PrimaryState::INTER_ITER);

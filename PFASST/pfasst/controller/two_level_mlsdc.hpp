@@ -65,7 +65,7 @@ namespace pfasst
       virtual void set_options() override;
 
       virtual void setup() override;
-      virtual void run() override;
+      void run(int nCoarse, int nFine);
 
       virtual bool advance_time(const size_t& num_steps) override;
       virtual bool advance_time() override;

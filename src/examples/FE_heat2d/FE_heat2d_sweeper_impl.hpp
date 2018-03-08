@@ -611,9 +611,9 @@ namespace pfasst
         //swap = M_rhs_dune;
         
         //add the source
-        swap=0.0; fastRect(t, u->get_data(), swap);
+        //swap=0.0; fastRect(t, u->get_data(), swap);
         //M_rhs_dune += dt*swap;
-        M_rhs_dune.axpy(dt, swap);
+        //M_rhs_dune.axpy(dt, swap);
         
         Dune::BCRSMatrix<Dune::FieldMatrix<double,1,1> > M_dtA_dune = 	Dune::BCRSMatrix<Dune::FieldMatrix<double,1,1> >(this->A_dune);
         M_dtA_dune *= (dt * this->_nu);

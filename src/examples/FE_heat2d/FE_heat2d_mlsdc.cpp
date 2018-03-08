@@ -111,6 +111,8 @@ namespace pfasst
                                            const double& t_0, const double& dt, const double& t_end,
                                            const size_t niter) 
       {
+        unsigned nCoarse = 10;
+        unsigned nFine = 2;
         typedef sweeper_t::GridType GridType;
         auto mlsdc = std::make_shared<heat_FE_mlsdc_t>();
 
@@ -126,7 +128,7 @@ namespace pfasst
         coarse->quadrature() = quadrature_factory<double>(nnodes, quad_type);
         auto fine = std::make_shared<sweeper_t>(nelements, basisorder, 1);
         fine->quadrature() = quadrature_factory<double>(nnodes, quad_type);
-        coarse->is_coarse = false;
+        coarse->is_coarse = true;
         fine->is_coarse = false;
 
         auto transfer = std::make_shared<transfer_t>();
@@ -168,7 +170,7 @@ namespace pfasst
 
 
 	Dune::Timer timer;
-        mlsdc->run();
+        mlsdc->run(nCoarse, nFine);
 	std::cout << "solve-mlsc: " << timer.elapsed() << std::endl;
 
 
