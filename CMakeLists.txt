@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dune-PFASST CXX)
+cmake_policy(SET CMP0057 NEW) #problem with dune-fem
 
 if(NOT (dune-common_DIR OR dune-common_ROOT OR
       "${CMAKE_PREFIX_PATH}" MATCHES ".*dune-common.*"))
@@ -17,7 +18,8 @@ include(DuneMacros)
 
 #dune-PFASST needs an installation of PFASST++
 #set installation path with cmake -Dpfasst_include=...
-SET(pfasst_include "/home/zam/ruth/software_engineering/PFASST/include" CACHE STRING "PFASST_DIR")#change default directory to /usr/include before push
+#SET(pfasst_include "/home/zam/ruth/software_engineering/PFASST/include" CACHE STRING "PFASST_DIR")#change default directory to /usr/include before push
+set(pfasst_include ${CMAKE_SOURCE_DIR}/PFASST/)
 include_directories(${pfasst_include})
 MESSAGE( STATUS "include directory of PFASST++ library is set to " ${pfasst_include} )
 
