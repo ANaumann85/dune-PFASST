@@ -126,7 +126,7 @@ namespace pfasst
         coarse->quadrature() = quadrature_factory<double>(nnodes, quad_type);
         auto fine = std::make_shared<sweeper_t>(nelements, basisorder, 1);
         fine->quadrature() = quadrature_factory<double>(nnodes, quad_type);
-        coarse->is_coarse = true;
+        coarse->is_coarse = false;
         fine->is_coarse = false;
 
         auto transfer = std::make_shared<transfer_t>();
@@ -260,8 +260,8 @@ int main(int argc, char** argv)
   const QuadratureType quad_type = QuadratureType::GaussRadau;
   const double t_0 = 0.0;
   double dt = get_value<double>("dt", 0.001);
-  double t_end = get_value<double>("tend", 0.001);
-  size_t nsteps = get_value<size_t>("num_steps", 0);
+  double t_end = get_value<double>("--tend", 0.001);
+  size_t nsteps = get_value<size_t>("--num_steps", 0);
   if (t_end == -1 && nsteps == 0) {
     ML_CLOG(ERROR, "USER", "Either t_end or num_steps must be specified.");
     throw std::runtime_error("either t_end or num_steps must be specified");

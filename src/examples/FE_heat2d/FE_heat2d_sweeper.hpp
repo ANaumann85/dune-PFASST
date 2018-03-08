@@ -21,7 +21,7 @@ using std::vector;
 
 #include <vector>
 
-#include <pfasst/sweeper/FE_impl.hpp>
+#include <pfasst/sweeper/FE_imex.hpp>
 #include <pfasst/contrib/fft.hpp>
 #include "fe_manager.hpp"
 
@@ -148,7 +148,7 @@ namespace pfasst
 
 
         protected:
-#if 0
+#if 1
           virtual shared_ptr<typename SweeperTrait::encap_t>
           evaluate_rhs_expl(const typename SweeperTrait::time_t& t,
                             const shared_ptr<typename SweeperTrait::encap_t> u) override;

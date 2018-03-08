@@ -350,7 +350,7 @@ namespace pfasst
         return rel_error;
       }
 
-#if 0
+#if 1
       template<class SweeperTrait, typename Enabled>
       shared_ptr<typename SweeperTrait::encap_t>
       Heat2d_FE<SweeperTrait, Enabled>::evaluate_rhs_expl(const typename SweeperTrait::time_t& t,
@@ -358,31 +358,35 @@ namespace pfasst
       {
         UNUSED(u);
         //ML_CVLOG(4, this->get_logger_id(), LOG_FIXED << "evaluating EXPLICIT part at t=" << t);	
-
+        
         auto result = this->get_encap_factory().create();	
         result->zero();
-
-	auto swap = this->get_encap_factory().create();
-	
-	//swap->data() = b_dune;
-	swap->zero();
-	//fastGrid(t, u->data(), swap->data());
-	fastRect(t, u->data(), swap->data());
-	MatrixAdapter<MatrixType,VectorType,VectorType> linearOperator(M_dune);
-
+        
+        auto swap = this->get_encap_factory().create();
+        
+        //swap->data() = b_dune;
+        swap->zero();
+        //fastGrid(t, u->data(), swap->data());
+        #if 1
+        fastRect(t, u->data(), result->data());
+        #else
+        fastRect(t, u->data(), swap->data());
+        MatrixAdapter<MatrixType,VectorType,VectorType> linearOperator(M_dune);
+        
         SeqILU0<MatrixType,VectorType,VectorType> preconditioner(M_dune,1.0);
-
+        
         CGSolver<VectorType> cg(linearOperator,
-                                preconditioner,
-                                1e-10, // desired residual reduction factor
-                                500,    // maximum number of iterations
-                                0);    // verbosity of the solver
+        preconditioner,
+        1e-10, // desired residual reduction factor
+        500,    // maximum number of iterations
+        0);    // verbosity of the solver
         InverseOperatorResult statistics ;
-
+        
         cg.apply(result->data(), swap->data() , statistics );
-
+        #endif
+        
         this->_num_expl_f_evals++;
-
+        
         return result;
       }
 #endif
@@ -580,7 +584,7 @@ namespace pfasst
         result->data() *= -nu;	
 
         //add the source
-        fastRect(t, u->get_data(), result->data());
+        //fastRect(t, u->get_data(), result->data());
         return result;
 
 
@@ -623,7 +627,7 @@ namespace pfasst
                                 preconditioner,
                                 1e-10, // desired residual reduction factor
                                 500,    // maximum number of iterations
-                                10);    // verbosity of the solver
+                                1);    // verbosity of the solver
         
         InverseOperatorResult statistics ;
         
