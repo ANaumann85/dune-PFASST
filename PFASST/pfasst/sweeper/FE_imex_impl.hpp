@@ -256,7 +256,7 @@ namespace pfasst
         }*/
         //std::exit(0);
       // reevaluate the explicit part with the new solution value
-      tm += dt * this->_q_delta_impl(m+1, m+1);
+      //tm += dt * this->_q_delta_impl(m+1, m+1);
       this->_expl_rhs[m + 1] = this->evaluate_rhs_expl(tm, this->get_states()[m + 1]);
 
 //       ML_CVLOG(4, this->get_logger_id(), LOG_FIXED << "  ==> values at t["<<(m+1)<<"]=" << (t + (dt * nodes[m+1])));
