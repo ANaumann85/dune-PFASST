@@ -130,7 +130,7 @@ namespace pfasst
           typedef GridType::LeafGridView GridView;
 
 
-          using BasisFunction = Dune::Functions::PQ1NodalBasis<GridView>;
+          using BasisFunction = Dune::Functions::PQkNodalBasis<GridView, BASE_ORDER>;
 
           std::shared_ptr<BasisFunction> basis;
           std::shared_ptr<BasisFunction> basis_coase;

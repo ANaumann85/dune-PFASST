@@ -1,4 +1,4 @@
-bindir="../release/src/examples/FE_heat2d/"
+bindir="../../release/src/examples/FE_heat2d/"
 
 nSteps="2 4 8 16 32 64"
 nFines="1 2 4"

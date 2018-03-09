@@ -32,7 +32,7 @@ using encap_traits_t = pfasst::encap::dune_vec_encap_traits<double, double, 1>;
 
 const size_t DIM = 2;            //Räumliche Dimension des Rechengebiets
 
-const size_t BASIS_ORDER = 1;    //maximale Ordnung der Lagrange Basisfunktionen
+const size_t BASIS_ORDER = BASE_ORDER;    //maximale Ordnung der Lagrange Basisfunktionen
 
 //////////////////////////////////////////////////////////////////////////////////////
 const size_t nelements = 10;
@@ -127,7 +127,7 @@ namespace pfasst
 
     const size_t nelements = get_value<size_t>("--num_elements", 1000); //Anzahl der Elemente pro Dimension
     const size_t nnodes    = get_value<size_t>("num_nodes", 3);
-    const QuadratureType quad_type = QuadratureType::GaussRadau;
+    const QuadratureType quad_type = QuadratureType::Uniform_Right;
     const double t_0 = 0.0;
     double dt = get_value<double>("dt", 0.025);
     double t_end = get_value<double>("--tend", 0.1);

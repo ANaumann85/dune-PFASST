@@ -30,6 +30,7 @@ namespace pfasst
       , GaussRadau      =  2  //!< @ref pfasst::quadrature::GaussRadau "Gauss-Radau" quadrature
       , ClenshawCurtis  =  3  //!< @ref pfasst::quadrature::ClenshawCurtis "Clenshaw-Curtis" quadrature
       , Uniform         =  4  //!< Uniform quadrature
+      , Uniform_Right   =  5  //!< Uniform quadrature
       , UNDEFINED       = -1
     };
 

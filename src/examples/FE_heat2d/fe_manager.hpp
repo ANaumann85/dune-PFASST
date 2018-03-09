@@ -55,7 +55,7 @@ typedef Dune::BlockVector<Dune::FieldVector<double,1> > VectorType;
 	  typedef Dune::YaspGrid<2> GridType; 
 	  //typedef GridType::LeafGridView GridView;
     typedef GridType::LevelGridView GridView;
-	  using BasisFunction = Dune::Functions::PQkNodalBasis<GridView,1>;// BASE_ORDER>;
+	  using BasisFunction = Dune::Functions::PQkNodalBasis<GridView,BASE_ORDER>;// BASE_ORDER>;
 	  //Dune::Functions::PQkNodalBasis<GridType::LeafGridView GridView,BASE_ORDER>;
     typedef TransferOperatorAssembler<GridType> TransferOperator;
 
@@ -126,6 +126,7 @@ typedef Dune::BlockVector<Dune::FieldVector<double,1> > VectorType;
 	      //while(basis.size() < nlevels)
 	      auto view = grid->levelGridView(i);
           fe_basis[nlevels-i-1] = std::make_shared<BasisFunction>(grid->levelGridView(i)); //grid->levelGridView(i));//gridView);
+          std::cout << "febasis[" <<i << "]->size(): " << fe_basis[nlevels-i-1]->size() << std::endl;
 	      n_dof[nlevels-i-1]    = fe_basis[nlevels-i-1]->size();
 
 	    } 

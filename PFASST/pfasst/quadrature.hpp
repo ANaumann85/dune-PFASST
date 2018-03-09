@@ -67,6 +67,8 @@ namespace pfasst
         return make_shared<ClenshawCurtis<precision>>(nnodes);
       } else if (qtype == QuadratureType::Uniform) {
         return make_shared<Uniform<precision>>(nnodes);
+      } else if (qtype == QuadratureType::Uniform_Right) {
+        return make_shared<Uniform_Right<precision>>(nnodes);
       } else {
         throw std::invalid_argument("invalid node type passed to compute_nodes.");
         return nullptr;

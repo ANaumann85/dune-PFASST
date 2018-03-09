@@ -79,9 +79,9 @@ using encap_traits_t = pfasst::encap::dune_vec_encap_traits<double, double, 1>;
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-const size_t DIM = 2;            //Räumliche Dimension des Rechengebiets
+const size_t DIM = DIMENSION;            //Räumliche Dimension des Rechengebiets
 
-const size_t BASIS_ORDER = 1;    //maximale Ordnung der Lagrange Basisfunktionen
+const size_t BASIS_ORDER = BASE_ORDER;    //maximale Ordnung der Lagrange Basisfunktionen
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -128,7 +128,7 @@ namespace pfasst
 
         auto coarse = std::make_shared<sweeper_t>(nelements, basisorder, 0);
         coarse->quadrature() = quadrature_factory<double>(nnodes, quad_type);
-        auto fine = std::make_shared<sweeper_t>(nelements, basisorder, 1);
+        auto fine = std::make_shared<sweeper_t>(nelements, basisorder, 0);
         fine->quadrature() = quadrature_factory<double>(nnodes, quad_type);
         coarse->is_coarse = true;
         fine->is_coarse = false;
@@ -205,6 +205,8 @@ namespace pfasst
         f.open(s, ios::app | std::ios::out );
         f << nelements << " " << dt << " "<< fine->states()[fine->get_states().size()-1]->norm0() << endl;
         f.close();*/
+        std::stringstream fname;
+        fname << "heat2dMoving_result_mlsdc_nCoarse_" << nCoarse << "_nFine_" << nFine << "_nIter_" << niter << "_nSteps_" << nSteps;
         if(BASIS_ORDER==1) {
           auto sweeper = fine;
           auto grid = (*sweeper).get_grid();
@@ -219,9 +221,16 @@ namespace pfasst
           //vtkWriter.addVertexData(y, "exact_solution");
           //vtkWriter.addVertexData(z, "initial_data");
           
-          std::stringstream fname;
-          fname << "heat2dMoving_result_mlsdc_nCoarse_" << nCoarse << "_nFine_" << nFine << "_nIter_" << niter << "_nSteps_" << nSteps;
           vtkWriter.write(fname.str());
+        } else {
+          fname << ".csv";
+          auto sweeper = fine;
+          VectorType x = sweeper->get_end_state()->data();
+          std::ofstream file(fname.str().c_str(), std::ios_base::trunc | std::ios_base::out);
+          file << std::setprecision(15);
+          for(auto& d : x)
+            file << d << std::endl;
+          file.close();
         }
         if(BASIS_ORDER==1 && false) {
           auto sweeper = coarse;
@@ -263,7 +272,7 @@ int main(int argc, char** argv)
   const size_t nelements = get_value<size_t>("--num_elements", 2);
   const size_t nnodes = get_value<size_t>("--num_nodes", 3);
   const size_t coarse_factor = get_value<size_t>("coarse_factor", 1);
-  const QuadratureType quad_type = QuadratureType::GaussRadau;
+  const QuadratureType quad_type = QuadratureType::Uniform_Right;
   const double t_0 = 0.0;
   double dt = get_value<double>("dt", 0.001);
   double t_end = get_value<double>("--tend", 0.001);
