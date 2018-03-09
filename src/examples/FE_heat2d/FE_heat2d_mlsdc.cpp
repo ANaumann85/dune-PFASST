@@ -272,7 +272,7 @@ int main(int argc, char** argv)
   const size_t nelements = get_value<size_t>("--num_elements", 2);
   const size_t nnodes = get_value<size_t>("--num_nodes", 3);
   const size_t coarse_factor = get_value<size_t>("coarse_factor", 1);
-  const QuadratureType quad_type = QuadratureType::Uniform_Right;
+  const QuadratureType quad_type = QuadratureType::GaussRadau;
   const double t_0 = 0.0;
   double dt = get_value<double>("dt", 0.001);
   double t_end = get_value<double>("--tend", 0.001);

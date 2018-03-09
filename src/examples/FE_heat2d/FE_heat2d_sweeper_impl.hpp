@@ -358,7 +358,7 @@ namespace pfasst
       {
         UNUSED(u);
         //ML_CVLOG(4, this->get_logger_id(), LOG_FIXED << "evaluating EXPLICIT part at t=" << t);	
-        
+        //std::cout << "eval rhs at " << t << std::endl;
         auto result = this->get_encap_factory().create();	
         result->zero();
         
@@ -544,6 +544,7 @@ namespace pfasst
         using namespace Dune;
 
         //ML_CVLOG(4, this->get_logger_id(), LOG_FIXED << "evaluating IMPLICIT part at t=" << t);
+        //std::cout << "evaluate impl at t=" << t <<std::endl;
 
 
         auto result = this->get_encap_factory().create();

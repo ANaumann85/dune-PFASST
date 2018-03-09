@@ -28,7 +28,7 @@ using std::shared_ptr;
 
 const size_t DIM = 2;            //Räumliche Dimension des Rechengebiets
 
-const size_t BASIS_ORDER = 1;    //maximale Ordnung der Lagrange Basisfunktionen
+const size_t BASIS_ORDER = BASE_ORDER;    //maximale Ordnung der Lagrange Basisfunktionen
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,9 +62,11 @@ namespace pfasst
     namespace heat_FE
     {
       void run_pfasst(const size_t nelements, const size_t basisorder, const size_t dim, const size_t& nnodes, const pfasst::quadrature::QuadratureType& quad_type,
-                      const double& t_0, const double& dt, const double& t_end, const size_t& niter)
+                      const double& t_0, unsigned nSteps, const double& t_end, const size_t& niter)
       {
-
+        using pfasst::config::get_value;
+        unsigned nCoarse = get_value<unsigned>("--nCoarse",1);
+        unsigned nFine = get_value<unsigned>("--nFine",1);
         typedef SweeperType::GridType GridType;
         int my_rank, num_pro;
         MPI_Comm_rank(MPI_COMM_WORLD, &my_rank );
@@ -97,7 +99,7 @@ namespace pfasst
 
 
         pfasst.status()->time() = t_0;
-        pfasst.status()->dt() = dt;
+        pfasst.status()->dt() = (t_end-t_0)/nSteps;
         pfasst.status()->t_end() = t_end;
         pfasst.status()->max_iterations() = niter;
 
@@ -106,12 +108,12 @@ namespace pfasst
         //coarse->initial_state() = coarse->exact(pfasst.get_status()->get_time());	
         //fine->initial_state() = fine->exact(pfasst.get_status()->get_time());
 	
-	coarse->initial_state() = coarse->initial();
-	fine->initial_state() = fine->initial();
-	Dune::Timer timer;
-
+        coarse->initial_state() = coarse->initial();
+        fine->initial_state() = fine->initial();
+        Dune::Timer timer;
+        
         pfasst.run();
-	std::cout << "solve-pfasst: " << timer.elapsed() << std::endl;
+        std::cout << "solve-pfasst: " << timer.elapsed() << std::endl;
         pfasst.post_run();
 
 
@@ -120,38 +122,49 @@ namespace pfasst
 
 
         if(my_rank==num_pro-1) {
-        auto anfang    = fine->exact(0)->data();
-        auto naeherung = fine->get_end_state()->data();
-        auto exact     = fine->exact(t_end)->data();
-//         for (int i=0; i< fine->get_end_state()->data().size(); i++){
-//           std::cout << anfang[i] << " " << naeherung[i] << "   " << exact[i] << " "  <<  std::endl;
-//         }
-
-        std::cout << "******************************************* " << std::endl;
-	if(BASIS_ORDER==1) {
-		auto sweeper = fine;
-		auto grid = (*sweeper).get_grid();
-		typedef GridType::LeafGridView GridView;
-		GridType::LeafGridView gridView = grid->leafGridView();
-		Dune::VTKWriter<GridView> vtkWriter(gridView);
-		typedef Dune::BlockVector<Dune::FieldVector<double, 1> > VectorType;
-		VectorType x = sweeper->get_end_state()->data();
-		//VectorType y = sweeper->exact(t_end)->data();
-		VectorType z = sweeper->initial_state()->data();
-		vtkWriter.addVertexData(x, "fe_solution");
-		//vtkWriter.addVertexData(y, "exact_solution");
-		vtkWriter.addVertexData(z, "initial_data");
-
-		vtkWriter.write("heat2dMoving_result");
-	}
-        std::cout << "******************************************* " << std::endl;
-        std::cout << " " << std::endl;
-        std::cout << " " << std::endl;
-
-//         fine->get_end_state()->scaled_add(-1.0, fine->exact(t_end));
-//         std::cout << "Fehler: "  << fine->get_end_state()->norm0() << " " << std::endl;
-
-
+          std::stringstream fname;
+          fname << "heat2dMoving_result_pfasst_nCoarse_" << nCoarse << "_nFine_" << nFine << "_nIter_" << niter << "_nSteps_" << nSteps << "_nCore_" << num_pro;
+          auto anfang    = fine->exact(0)->data();
+          auto naeherung = fine->get_end_state()->data();
+          auto exact     = fine->exact(t_end)->data();
+          //         for (int i=0; i< fine->get_end_state()->data().size(); i++){
+          //           std::cout << anfang[i] << " " << naeherung[i] << "   " << exact[i] << " "  <<  std::endl;
+          //         }
+          
+          std::cout << "******************************************* " << std::endl;
+          if(BASIS_ORDER==1) {
+            auto sweeper = fine;
+            auto grid = (*sweeper).get_grid();
+            typedef GridType::LeafGridView GridView;
+            GridType::LeafGridView gridView = grid->leafGridView();
+            Dune::VTKWriter<GridView> vtkWriter(gridView);
+            typedef Dune::BlockVector<Dune::FieldVector<double, 1> > VectorType;
+            VectorType x = sweeper->get_end_state()->data();
+            //VectorType y = sweeper->exact(t_end)->data();
+            VectorType z = sweeper->initial_state()->data();
+            vtkWriter.addVertexData(x, "fe_solution");
+            //vtkWriter.addVertexData(y, "exact_solution");
+            vtkWriter.addVertexData(z, "initial_data");
+            
+            vtkWriter.write("heat2dMoving_result");
+          }  else {
+            fname << ".csv";
+            auto sweeper = fine;
+            VectorType x = sweeper->get_end_state()->data();
+            std::ofstream file(fname.str().c_str(), std::ios_base::trunc | std::ios_base::out);
+            file << std::setprecision(15);
+            for(auto& d : x)
+              file << d << std::endl;
+            file.close();
+          }
+          std::cout << "******************************************* " << std::endl;
+          std::cout << " " << std::endl;
+          std::cout << " " << std::endl;
+          
+          //         fine->get_end_state()->scaled_add(-1.0, fine->exact(t_end));
+          //         std::cout << "Fehler: "  << fine->get_end_state()->norm0() << " " << std::endl;
+          
+          
         }
 
       }
@@ -178,7 +191,7 @@ int main(int argc, char* argv[])
   const double t_0 = 0.0;
   
   double t_end = get_value<double>("tend", -1);
-  size_t nsteps = get_value<size_t>("num_steps", 0);
+  size_t nsteps = get_value<size_t>("--num_steps", 0);
   
   double dt = get_value<double>("dt", 0.1);
   if (t_end == -1 && nsteps == 0) {
@@ -197,10 +210,10 @@ int main(int argc, char* argv[])
   } else if (nsteps != 0) {
     t_end = t_0 + dt * nsteps;
   }
-  const size_t niter = get_value<size_t>("num_iters", 50);
+  const size_t niter = get_value<size_t>("--num_iters", 50);
 
 
-  pfasst::examples::heat_FE::run_pfasst(nelements, BASIS_ORDER, DIM, nnodes, quad_type, t_0, dt, t_end, niter);
+  pfasst::examples::heat_FE::run_pfasst(nelements, BASIS_ORDER, DIM, nnodes, quad_type, t_0, nsteps, t_end, niter);
 
   pfasst::Status<double>::free_mpi_datatype();
 
