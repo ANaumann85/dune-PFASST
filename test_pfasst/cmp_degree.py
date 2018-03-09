@@ -30,7 +30,7 @@ for nCore in nCores:
     nIter = nIters[nIterP]
     for nStepP in range(len(nSteps)):
       nStep=nSteps[nStepP]
-      data={'nIter' : nIter, 'nSteps' : nStep, 'nCore':nCore}
+      data={'nIter' : nIter, 'nSteps' : nStep*nCore, 'nCore':nCore}
       res=resFormat % data
       diff=[0,0]
       if os.path.isfile(res):
