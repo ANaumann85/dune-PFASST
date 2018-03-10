@@ -112,7 +112,7 @@ namespace pfasst
         fine->initial_state() = fine->initial();
         Dune::Timer timer;
         
-        pfasst.run();
+        pfasst.run(nCoarse, nFine);
         std::cout << "solve-pfasst: " << timer.elapsed() << std::endl;
         pfasst.post_run();
 

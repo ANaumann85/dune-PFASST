@@ -44,7 +44,7 @@
 #include <dune/functions/gridfunctions/gridviewfunction.hh> 
 
 
-const int BASE_ORDER=3;
+const int BASE_ORDER=2;
 const int DIMENSION=2;
 const int NR_COMP=1;
 

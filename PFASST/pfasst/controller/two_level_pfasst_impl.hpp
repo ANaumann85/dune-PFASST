@@ -66,7 +66,7 @@ namespace pfasst
 
   template<class TransferT, class CommT>
   void
-  TwoLevelPfasst<TransferT, CommT>::run()
+  TwoLevelPfasst<TransferT, CommT>::run(unsigned nCoarse, unsigned nFine)
   {
     Controller<TransferT, CommT>::run();
 
@@ -119,12 +119,13 @@ namespace pfasst
           this->cycle_down();
 
           this->recv_coarse();
-          this->sweep_coarse();
+          for(int i(0); i < nCoarse ; ++i)
+            this->sweep_coarse();
           this->send_coarse();
 
           this->cycle_up();
-
-          this->sweep_fine();
+          for(int i(0); i < nFine ; ++i)
+            this->sweep_fine();
           this->send_fine();
 
         } else {
